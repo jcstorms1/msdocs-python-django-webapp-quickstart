@@ -26,10 +26,10 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
-      
+
       - name: Install dependencies
         run: pip install -r requirements.txt
-        
+
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Zip artifact for deployment
@@ -49,7 +49,7 @@ jobs:
     environment:
       name: 'staging'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
@@ -59,11 +59,12 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
         with:
           app-name: 'serverless-slot-tests-linux'
           slot-name: 'staging'
+          startup-command: 'curl -s https://raw.githubusercontent.com/DataDog/datadog-aas-linux/v1.3.0/datadog_wrapper | bash'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C4245EAA783445BDBC65CDD5566B7687 }}
